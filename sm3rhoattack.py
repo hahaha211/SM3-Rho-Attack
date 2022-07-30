@@ -6,6 +6,7 @@ FRONTS = 24
 vi = 0x13579acefdb8642013579acefdb8642013579acefdb8642013579acefdb86420
 t = [0x79cc4519, 0x7a879d8a]
 
+#十进制数转化为定长二进制字符串(补0)
 def Int2Bin(octs, ra):
     bins = list(bin(octs)[2:])
     #补零
@@ -13,6 +14,7 @@ def Int2Bin(octs, ra):
         bins.insert(0, '0')
     return ''.join(bins)
 
+#循环左移
 def LoopLeftShift(a, k):
     res = list(Int2Bin(a, 32))
     for i in range(0,k):
@@ -20,6 +22,7 @@ def LoopLeftShift(a, k):
         res.append(temp)
     return int(''.join(res), 2)
 
+#扩展函数，512bit->132word(w:68-words,w1:64-words)
 def msgExten(b):
     w = []
     w1 = []
@@ -37,6 +40,7 @@ def msgExten(b):
         w1.append(f1)
     return w, w1
 
+#消息填充函数，n-bits->k*512-bits
 def fillFunc(mess):
     mess = bin(mess)[2:]
     for i in range(4):
@@ -52,6 +56,7 @@ def fillFunc(mess):
     mess += addM
     return mess
 
+#消息压缩函数
 def IterFunc(mess):
     n = int(len(mess) / 512)
     v = []
@@ -63,9 +68,11 @@ def IterFunc(mess):
         v.append(temp)
     return v[n]
 
+#置换
 def P0(X):
     return X ^ LoopLeftShift(X, 9) ^ LoopLeftShift(X, 17)
 
+#置换
 def P1(X):
     return X ^ LoopLeftShift(X, 15) ^ LoopLeftShift(X, 23)
 
@@ -75,13 +82,14 @@ def T(j):
     else:
         return t[1]
 
+#布尔函数
 def FFj(X, Y, Z, j):
     if j <= 15:
         return X ^ Y ^ Z
     else:
         return (X & Y) | (X & Z) | (Y & Z)
 
-
+#布尔函数
 def GGj(X, Y, Z, j):
     if j <= 15:
         return X ^ Y ^ Z
@@ -133,6 +141,7 @@ def SM3(mess):
     result=hex(int(res,2))
     return result[2:]
 
+#Rho攻击，建表存值，每存一次遍历一遍
 def Rho_Attck(n):
     res=[]
     a=random.randint(0,2**64)
